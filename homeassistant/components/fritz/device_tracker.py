@@ -9,7 +9,7 @@ from homeassistant.components.device_tracker import (
     PLATFORM_SCHEMA,
     DeviceScanner,
 )
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME, ATTR_LOCATION
 import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
@@ -21,6 +21,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_HOST, default=CONF_DEFAULT_IP): cv.string,
         vol.Optional(CONF_PASSWORD, default="admin"): cv.string,
         vol.Optional(CONF_USERNAME, default=""): cv.string,
+        vol.Optional(ATTR_LOCATION, default=""): cv.string,
     }
 )
 
@@ -40,6 +41,7 @@ class FritzBoxScanner(DeviceScanner):
         self.host = config[CONF_HOST]
         self.username = config[CONF_USERNAME]
         self.password = config[CONF_PASSWORD]
+        self.location = config[ATTR_LOCATION]
         self.success_init = True
 
         # Establish a connection to the FRITZ!Box.

@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, Optional
 
 import attr
 
-from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
+from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE, ATTR_FRIENDLY_NAME
 from homeassistant.core import callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_per_platform
@@ -21,6 +21,7 @@ from .const import (
     PLATFORM_TYPE_LEGACY,
     SCAN_INTERVAL,
     SOURCE_TYPE_ROUTER,
+    CONF_LOCATION
 )
 
 
@@ -182,13 +183,20 @@ def async_setup_scanner_platform(
                 },
             }
 
-            zone_home = hass.states.get(hass.components.zone.ENTITY_ID_HOME)
-            if zone_home:
+            location = config.get(CONF_LOCATION, "")
+            if location:
+                zone = hass.states.get(location)
+            else:
+                location = hass.components.zone.ENTITY_ID_HOME
+                zone = hass.states.get(hass.components.zone.ENTITY_ID_HOME)
+            if zone:
                 kwargs["gps"] = [
-                    zone_home.attributes[ATTR_LATITUDE],
-                    zone_home.attributes[ATTR_LONGITUDE],
+                    zone.attributes[ATTR_LATITUDE],
+                    zone.attributes[ATTR_LONGITUDE],
                 ]
                 kwargs["gps_accuracy"] = 0
+                if (location != hass.components.zone.ENTITY_ID_HOME):
+                    kwargs["location_name"] = zone.attributes[ATTR_FRIENDLY_NAME]
 
             hass.async_create_task(async_see_device(**kwargs))
 
