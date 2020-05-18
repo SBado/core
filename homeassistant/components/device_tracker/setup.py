@@ -183,12 +183,8 @@ def async_setup_scanner_platform(
                 },
             }
 
-            location = config.get(CONF_LOCATION, "")
-            if location:
-                zone = hass.states.get(location)
-            else:
-                location = hass.components.zone.ENTITY_ID_HOME
-                zone = hass.states.get(hass.components.zone.ENTITY_ID_HOME)
+            location = config.get(CONF_LOCATION, hass.components.zone.ENTITY_ID_HOME)
+            zone = hass.states.get(location)
             if zone:
                 kwargs["gps"] = [
                     zone.attributes[ATTR_LATITUDE],
